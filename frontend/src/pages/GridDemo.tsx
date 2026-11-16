@@ -5,7 +5,7 @@ import { getHealth } from "../api/client";
 
 type Row = { idx: number; token: string; gloss: string; l1: string; l2: string; l3: string };
 
-// Proposal Table 3.3 — placeholder rows until the import pipeline exists.
+// Sample rows from proposal Table 3.3
 const SAMPLE: Row[] = [
   { idx: 1, token: "မန္တလေး", gloss: "Mandalay", l1: "B-JOB", l2: "S-CITY", l3: "O" },
   { idx: 2, token: "မြို့တော်ဝန်", gloss: "mayor", l1: "E-JOB", l2: "O", l3: "O" },

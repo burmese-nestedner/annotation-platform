@@ -1,12 +1,4 @@
-"""Normalized annotation schema (spec §4, proposal §3.6).
-
-The tagging grid (one row per token, one column per layer) is only a VIEW.
-Storage is one row per (token, layer, annotator), so the annotator grid, the
-IAA comparison and the gold table are just different queries over this data.
-
-Annotations are stored sparsely: a missing row means "O". Each stored row is a
-BIOES prefix (B/I/E/S) plus an entity type.
-"""
+"""Annotation schema: one row per (token, layer, annotator); a missing row means O."""
 
 from __future__ import annotations
 
@@ -82,7 +74,6 @@ class TimestampMixin:
     )
 
 
-# ---------------------------------------------------------------- accounts
 class User(TimestampMixin, Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -92,7 +83,6 @@ class User(TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(server_default="true")
 
 
-# ---------------------------------------------------------------- project config
 class Project(TimestampMixin, Base):
     __tablename__ = "projects"
     __table_args__ = (CheckConstraint("num_layers BETWEEN 1 AND 10", name="num_layers_range"),)
@@ -121,15 +111,15 @@ class EntityType(Base):
     __table_args__ = (UniqueConstraint("project_id", "code"),)
     id: Mapped[int] = mapped_column(primary_key=True)
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
-    code: Mapped[str] = mapped_column(String(50))          # e.g. "STATE"
-    label: Mapped[str] = mapped_column(String(100))        # e.g. "State"
+    code: Mapped[str] = mapped_column(String(50))
+    label: Mapped[str] = mapped_column(String(100))
     group_name: Mapped[str | None] = mapped_column(String(50))  # for result summaries only
     color: Mapped[str | None] = mapped_column(String(9))
     description: Mapped[str | None] = mapped_column(Text)
 
 
 class NestingRule(Base):
-    """Allowed parent -> child type pairs (proposal Table 3.2). Configurable per project."""
+    """Allowed parent -> child type pairs (Table 3.2)."""
 
     __tablename__ = "nesting_rules"
     __table_args__ = (UniqueConstraint("project_id", "parent_type_id", "child_type_id"),)
@@ -139,7 +129,6 @@ class NestingRule(Base):
     child_type_id: Mapped[int] = mapped_column(ForeignKey("entity_types.id", ondelete="CASCADE"))
 
 
-# ---------------------------------------------------------------- text
 class Document(TimestampMixin, Base):
     __tablename__ = "documents"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -170,7 +159,6 @@ class Token(Base):
     pos_tag: Mapped[str | None] = mapped_column(String(20))   # myPOS
 
 
-# ---------------------------------------------------------------- batches & access
 class Batch(TimestampMixin, Base):
     __tablename__ = "batches"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -200,7 +188,6 @@ class BatchPermission(Base):
     access: Mapped[BatchAccess] = mapped_column(_enum(BatchAccess, "batch_access"))
 
 
-# ---------------------------------------------------------------- annotations
 class Annotation(Base):
     """One BIOES tag for one token, one layer, one annotator, within one batch."""
 
@@ -241,7 +228,7 @@ class GoldAnnotation(Base):
 
 
 class AnnotationAuditLog(Base):
-    """Every create/update/delete/promote of any annotation (spec §13)."""
+    """Edit history of every annotation (spec §13)."""
 
     __tablename__ = "annotation_audit_log"
     __table_args__ = (Index("ix_audit_token_layer", "token_id", "layer"),)

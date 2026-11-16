@@ -1,4 +1,4 @@
-#enable row level security on all public tables 
+"""Enable row level security on all public tables."""
 from collections.abc import Sequence
 
 from alembic import op
