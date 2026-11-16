@@ -1,52 +1,104 @@
 # Burmese-NestedNER Annotation Platform
 
-A customizable web platform for **flat and nested NER annotation**, built for the
-Burmese-NestedNER senior project (KMUTT, 2026–27). Entity types, nesting rules,
-number of layers and tokenizer are configured per project, so other Burmese NLP
-researchers can reuse it.
+## Overview
+A web platform for creating **flat and nested Named Entity Recognition (NER)** datasets, built for the
+Burmese-NestedNER senior project. Annotators tag tokens in a spreadsheet-style grid with multiple
+nesting layers and real-time BIOES checks. The platform also supports inter-annotator agreement (IAA),
+adjudication into a gold dataset, and CoNLL export.
 
-**Stack:** FastAPI · PostgreSQL (Supabase) · SQLAlchemy 2 + Alembic · React + Vite + AG Grid · Docker
+Entity types, nesting rules, number of layers and tokenizer are configured per project, so other
+Burmese NLP researchers can reuse it.
 
-## Quick start
-Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) and access to the
-team's Supabase project.
+**Tech stack**
 
-```bash
-cp .env.example .env          # then paste the Supabase connection string into DATABASE_URL
-docker compose up --build
-```
-
-| Service | URL |
+| Layer | Technology |
 |---|---|
-| Frontend | http://localhost:5173 |
-| API docs | http://localhost:8000/docs |
-| Health check | http://localhost:8000/api/health/db |
+| Frontend | React, TypeScript, Vite, AG Grid |
+| Backend | FastAPI, SQLAlchemy 2, Alembic |
+| Database | PostgreSQL (Supabase) |
 
-Migrations are **not** run automatically, because everyone shares one Supabase database.
-Only run them when the team has agreed (see CONTRIBUTING.md):
+## Project Structure
+```
+annotation-platform/
+├── backend/
+│   ├── app/              FastAPI app (api, core, db, models)
+│   ├── alembic/          database migrations
+│   └── tests/
+├── frontend/
+│   └── src/              React app (api, pages)
+├── .github/workflows/    CI
+├── docker-compose.yml
+└── .env.example
+```
+
+## Developer Guide
+
+### Setup
+Requires Python 3.10+ and Node.js 20+.
 
 ```bash
-docker compose run --rm backend alembic upgrade head
+git clone https://github.com/burmese-nestedner/annotation-platform.git
+cd annotation-platform
+cp .env.example .env
+
+cd backend
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+
+cd ../frontend
+npm install
 ```
 
-## Layout
-```
-backend/
-  app/            FastAPI app (api/, core/, db/, models/)
-  alembic/        database migrations
-  tests/
-frontend/src/     React app (api/, pages/)
-docs/             design notes
+### Environment Variables
+Set in `.env` at the project root.
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | Supabase Session pooler URL, starting with `postgresql+psycopg://` and ending with `?sslmode=require` |
+| `JWT_SECRET` | Secret key for login tokens |
+| `CORS_ORIGINS` | Allowed frontend origins, e.g. `["http://localhost:5173"]` |
+
+### Development
+```bash
+# backend (http://localhost:8000/docs)
+cd backend && uvicorn app.main:app --reload
+
+# frontend (http://localhost:5173)
+cd frontend && npm run dev
 ```
 
-## Data model
-The tagging grid is only a view. Annotations are stored as one row per
-**(token, layer, annotator)**, so the annotator grid, IAA comparison and gold table
-are different queries over the same data. Absent rows mean `O`.
-See `backend/app/models/schema.py`.
+Apply database migrations only after the PR that adds them is merged into `dev`:
+```bash
+cd backend && alembic upgrade head
+```
+
+### Format
+```bash
+cd backend
+ruff check . --fix
+ruff format .
+```
+
+### Test
+```bash
+cd backend && pytest
+```
+
+### Build
+```bash
+cd frontend && npm run build
+```
 
 ## Contributing
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+1. Create a new branch from `dev`:
+   ```bash
+   git checkout -b feat/your-feature
+   ```
+2. Commit your changes:
+   ```bash
+   git commit -m "feat: add your feature"
+   ```
+3. Push and open a Pull Request into `dev`.
 
 ## License
-Code: MIT. Datasets produced with this platform carry their own licenses.
+MIT

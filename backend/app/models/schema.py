@@ -57,7 +57,7 @@ class TagPrefix(str, enum.Enum):
 
 
 class GoldSource(str, enum.Enum):
-    consensus = "consensus"      # all annotators agreed -> auto-promoted
+    consensus = "consensus"  # all annotators agreed -> auto-promoted
     adjudicated = "adjudicated"  # resolved by an adjudicator
 
 
@@ -69,9 +69,7 @@ class AuditAction(str, enum.Enum):
 
 
 class TimestampMixin:
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class User(TimestampMixin, Base):
@@ -134,8 +132,8 @@ class Document(TimestampMixin, Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
     name: Mapped[str] = mapped_column(String(255))
-    source: Mapped[str | None] = mapped_column(String(100))   # myfinener / wikipedia / ...
-    source_url: Mapped[str | None] = mapped_column(Text)      # kept for CC BY-SA attribution
+    source: Mapped[str | None] = mapped_column(String(100))  # myfinener / wikipedia / ...
+    source_url: Mapped[str | None] = mapped_column(Text)  # kept for CC BY-SA attribution
     license: Mapped[str | None] = mapped_column(String(50))
     meta: Mapped[dict | None] = mapped_column(JSONB)
 
@@ -156,7 +154,7 @@ class Token(Base):
     sentence_id: Mapped[int] = mapped_column(ForeignKey("sentences.id", ondelete="CASCADE"))
     position: Mapped[int]
     text: Mapped[str] = mapped_column(String(200))
-    pos_tag: Mapped[str | None] = mapped_column(String(20))   # myPOS
+    pos_tag: Mapped[str | None] = mapped_column(String(20))  # myPOS
 
 
 class Batch(TimestampMixin, Base):
@@ -242,6 +240,4 @@ class AnnotationAuditLog(Base):
     layer: Mapped[int] = mapped_column(SmallInteger)
     old_value: Mapped[dict | None] = mapped_column(JSONB)
     new_value: Mapped[dict | None] = mapped_column(JSONB)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

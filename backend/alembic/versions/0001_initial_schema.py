@@ -104,7 +104,9 @@ def upgrade() -> None:
         fk("nesting_rules", "parent_type_id", "entity_types", "CASCADE"),
         fk("nesting_rules", "child_type_id", "entity_types", "CASCADE"),
         sa.UniqueConstraint(
-            "project_id", "parent_type_id", "child_type_id",
+            "project_id",
+            "parent_type_id",
+            "child_type_id",
             name="uq_nesting_rules_project_id_parent_type_id_child_type_id",
         ),
     )
@@ -194,7 +196,10 @@ def upgrade() -> None:
         fk("annotations", "annotator_id", "users", "CASCADE"),
         fk("annotations", "entity_type_id", "entity_types"),
         sa.UniqueConstraint(
-            "batch_id", "token_id", "layer", "annotator_id",
+            "batch_id",
+            "token_id",
+            "layer",
+            "annotator_id",
             name="uq_annotations_batch_id_token_id_layer_annotator_id",
         ),
         sa.CheckConstraint("layer >= 1", name="ck_annotations_layer_positive"),
@@ -244,9 +249,20 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     for table in (
-        "annotation_audit_log", "gold_annotations", "annotations", "batch_permissions",
-        "batch_sentences", "batches", "tokens", "sentences", "documents", "nesting_rules",
-        "entity_types", "project_members", "projects", "users",
+        "annotation_audit_log",
+        "gold_annotations",
+        "annotations",
+        "batch_permissions",
+        "batch_sentences",
+        "batches",
+        "tokens",
+        "sentences",
+        "documents",
+        "nesting_rules",
+        "entity_types",
+        "project_members",
+        "projects",
+        "users",
     ):
         op.drop_table(table)
     bind = op.get_bind()
