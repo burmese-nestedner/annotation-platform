@@ -218,3 +218,23 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---- Project additions ----
+# Environment
+.env
+!.env.example
+
+# Node / frontend
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Data & models (never commit raw data or checkpoints)
+data/
+*.conll
+!tests/fixtures/*.conll
+checkpoints/
+
+# OS / editors
+.DS_Store
+.idea/
