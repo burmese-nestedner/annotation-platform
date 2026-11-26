@@ -49,9 +49,3 @@ export const MOCK_SENTENCES: Sentence[] = [
     ],
   },
 ];
-
-export const LAYERS = [
-  { label: "Layer 1 (Outer)", tone: "violet" },
-  { label: "Layer 2 (Inner)", tone: "cyan" },
-  { label: "Layer 3", tone: "pink" },
-] as const;

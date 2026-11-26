@@ -39,7 +39,19 @@ export default function CreateProjectPage() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevTokenizer = useRef("");
-  const { form, setForm, setSentences, setPipes, parsedFile, setParsedFile, setTable, setMapping } = useNewProject();
+  const {
+    form,
+    setForm,
+    setSentences,
+    setPipes,
+    parsedFile,
+    setParsedFile,
+    table,
+    setTable,
+    setMapping,
+    mappingMode,
+    setMappingMode,
+  } = useNewProject();
   const [submitted, setSubmitted] = useState(false);
   const [fileError, setFileError] = useState("");
   const [reading, setReading] = useState(false);
@@ -73,6 +85,7 @@ export default function CreateProjectPage() {
     if (!file) return;
     const ok = ACCEPTED_FILE_TYPES.some((ext) => file.name.toLowerCase().endsWith(ext));
     if (ok) setFile(file);
+    else setFileError(`Only ${ACCEPTED_FILE_TYPES.join(" and ")} files are accepted.`);
   };
 
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -89,7 +102,14 @@ export default function CreateProjectPage() {
   const onNext = async () => {
     setSubmitted(true);
     if (Object.keys(validate(form)).length > 0 || !form.file) return scrollToError();
-    if (form.file === parsedFile) return navigate("tokenize"); // keep pipe edits
+    if (form.file === parsedFile && table) {
+      // same file: keep sentences and pipe edits; re-suggest columns only if the mode changed
+      if (form.mode !== mappingMode) {
+        setMapping(suggestMapping(table, form.mode));
+        setMappingMode(form.mode);
+      }
+      return navigate("tokenize");
+    }
     setReading(true);
     try {
       const { sentences, table } = await readImport(form.file);
@@ -101,6 +121,7 @@ export default function CreateProjectPage() {
       setParsedFile(form.file);
       setTable(table);
       setMapping(suggestMapping(table, form.mode));
+      setMappingMode(form.mode);
       setPipes(
         Object.fromEntries(sentences.map((s) => [s.id, s.tokens ? boundariesFromTokens(s.tokens) : []])),
       );

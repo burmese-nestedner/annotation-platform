@@ -6,7 +6,8 @@ import StatusBar from "../components/annotation/StatusBar";
 import { Button } from "@/components/ui/button";
 import AlertPill from "../components/ui/AlertPill";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ENTITY_TYPES, LAYERS, MOCK_SENTENCES } from "../data/mockAnnotation";
+import { ENTITY_TYPES, MOCK_SENTENCES } from "../data/mockAnnotation";
+import { layerColumns } from "../utils/tags";
 import type { Project } from "../types/project";
 import type { Sentence } from "../types/annotation";
 import { validateBioes } from "@/utils/bioes";
@@ -19,7 +20,7 @@ export default function AnnotationPage() {
   // editable copy of the mock data until the annotations API exists
   const [data, setData] = useState<Sentence[]>(MOCK_SENTENCES);
 
-  const layers = LAYERS.slice(0, project.layers);
+  const layers = useMemo(() => layerColumns(project.layers), [project.layers]);
   const sentences = useMemo(
     () => data.filter((s) => sentenceId === "all" || s.id === sentenceId),
     [data, sentenceId],
@@ -83,7 +84,7 @@ export default function AnnotationPage() {
       <div className="@container flex-1 overflow-auto">
         <AnnotationGrid
           sentences={sentences}
-          layers={[...layers]}
+          layers={layers}
           entities={ENTITY_TYPES}
           errors={errors}
           onTagChange={setTag}

@@ -28,6 +28,8 @@ interface NewProjectState {
   setTable: Dispatch<SetStateAction<ImportedTable | null>>;
   mapping: Record<string, string>; // file column -> platform field ("token", "layer1", …)
   setMapping: Dispatch<SetStateAction<Record<string, string>>>;
+  mappingMode: string; // annotation mode the mapping was suggested for
+  setMappingMode: Dispatch<SetStateAction<string>>;
   entities: ProjectEntity[]; // entity types picked on step 4
   setEntities: Dispatch<SetStateAction<ProjectEntity[]>>;
   customTypes: EntityTypeOption[]; // created on step 4, added to the catalog
@@ -56,6 +58,7 @@ export function NewProjectProvider({ children }: { children: ReactNode }) {
   const [parsedFile, setParsedFile] = useState<File | null>(null);
   const [table, setTable] = useState<ImportedTable | null>(null);
   const [mapping, setMapping] = useState<Record<string, string>>({});
+  const [mappingMode, setMappingMode] = useState("");
   const [entities, setEntities] = useState<ProjectEntity[]>([]);
   const [customTypes, setCustomTypes] = useState<EntityTypeOption[]>([]);
   const [layers, setLayers] = useState(2);
@@ -75,6 +78,8 @@ export function NewProjectProvider({ children }: { children: ReactNode }) {
         setTable,
         mapping,
         setMapping,
+        mappingMode,
+        setMappingMode,
         entities,
         setEntities,
         customTypes,
