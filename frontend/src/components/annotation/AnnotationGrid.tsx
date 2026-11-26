@@ -1,6 +1,5 @@
-import { useState, type CSSProperties } from "react";
+import { useMemo, type CSSProperties } from "react";
 import TagCell from "./TagCell";
-import ErrorPopover from "./ErrorPopover";
 import { toneClass, type Tone } from "../ui/tone";
 import { toneOf } from "../../utils/tags";
 import { cn } from "@/lib/utils";
@@ -26,13 +25,20 @@ interface AnnotationGridProps {
   layers: LayerColumn[];
   entities: EntityType[];
   errors: ValidationError[];
+  onTagChange: (sentenceId: string, tokenIndex: number, layer: number, tag: string) => void;
 }
 
-export default function AnnotationGrid({ sentences, layers, entities, errors }: AnnotationGridProps) {
-  const [open, setOpen] = useState<string | null>(null);
+export default function AnnotationGrid({ sentences, layers, entities, errors, onTagChange }: AnnotationGridProps) {
   const style = { "--layers": layers.length } as CSSProperties;
-  const keyOf = (e: Pick<ValidationError, "sentenceId" | "tokenIndex" | "layer">) =>
-    `${e.sentenceId}:${e.tokenIndex}:${e.layer}`;
+  const keyOf = (sentenceId: string, tokenIndex: number, layer: number) => `${sentenceId}:${tokenIndex}:${layer}`;
+  const errorAt = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const e of errors) {
+      const k = keyOf(e.sentenceId, e.tokenIndex, e.layer);
+      if (!m.has(k)) m.set(k, e.message);
+    }
+    return m;
+  }, [errors]);
 
   return (
     <div className="min-w-[calc(176px_+_var(--layers)_*_120px)]" style={style}>
@@ -59,29 +65,16 @@ export default function AnnotationGrid({ sentences, layers, entities, errors }: 
               <span className={PIN_INDEX}>{i + 1}</span>
               <span className={PIN_TOKEN}>{t.text}</span>
               {layers.map((_, layer) => {
-                const err = errors.find((e) => keyOf(e) === keyOf({ sentenceId: s.id, tokenIndex: i, layer }));
-                const key = keyOf({ sentenceId: s.id, tokenIndex: i, layer });
                 const tag = t.tags[layer] ?? "O";
                 return (
                   <TagCell
                     key={layer}
                     tag={tag}
                     tone={toneOf(tag, entities)}
-                    error={!!err}
-                    popover={
-                      err
-                        ? {
-                            open: open === key,
-                            onOpenChange: (o) => setOpen(o ? key : null),
-                            content: (
-                              <ErrorPopover
-                                location={`${s.id} · Token ${i + 1} · Layer ${layer + 1}`}
-                                message={err.message}
-                              />
-                            ),
-                          }
-                        : undefined
-                    }
+                    entities={entities}
+                    location={`${s.id} · Token ${i + 1} · Layer ${layer + 1}`}
+                    error={errorAt.get(keyOf(s.id, i, layer))}
+                    onChange={(next) => onTagChange(s.id, i, layer, next)}
                   />
                 );
               })}

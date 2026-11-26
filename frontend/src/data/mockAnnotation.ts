@@ -1,13 +1,13 @@
-import type { EntityType, Sentence, ValidationError } from "../types/annotation";
+import type { EntityType, Sentence } from "../types/annotation";
 
 export const ENTITY_TYPES: EntityType[] = [
-  { code: "ORG", tone: "violet" },
-  { code: "PER", tone: "blue" },
-  { code: "GPE", tone: "amber" },
-  { code: "LOC", tone: "green" },
-  { code: "FAC", tone: "pink" },
-  { code: "EVENT", tone: "red" },
-  { code: "TITLE", tone: "cyan" },
+  { code: "ORG", label: "Organization", tone: "violet" },
+  { code: "PER", label: "Person", tone: "blue" },
+  { code: "GPE", label: "Geo-Political Entity", tone: "amber" },
+  { code: "LOC", label: "Location", tone: "green" },
+  { code: "FAC", label: "Facility", tone: "pink" },
+  { code: "EVENT", label: "Event", tone: "red" },
+  { code: "TITLE", label: "Title / Position", tone: "cyan" },
 ];
 
 const row = (text: string, ...tags: string[]) => ({ text, tags });
@@ -41,21 +41,12 @@ export const MOCK_SENTENCES: Sentence[] = [
     id: "SENT-3",
     text: "ကုလသမဂ္ဂ၏ ရုံးချုပ်သည် နယူးယောက်မြို့တွင် တည်ရှိသည်။",
     tokens: [
-      row("ကုလသမဂ္ဂ", "B-ORG", "O", "O"),
+      row("ကုလသမဂ္ဂ", "S-ORG", "O", "O"),
       row("ရုံးချုပ်", "E-ORG", "O", "O"),
       row("နယူးယောက်မြို့", "S-GPE", "S-LOC", "O"),
       row("တွင်", "O", "O", "O"),
       row("တည်ရှိသည်", "O", "O", "O"),
     ],
-  },
-];
-
-export const MOCK_ERRORS: ValidationError[] = [
-  {
-    sentenceId: "SENT-2",
-    tokenIndex: 1,
-    layer: 0,
-    message: 'Invalid tag "E-TITLE". Check the BIOES sequence: B → I → E, or S for a single-token entity.',
   },
 ];
 
