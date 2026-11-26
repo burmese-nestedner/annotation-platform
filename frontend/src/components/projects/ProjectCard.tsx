@@ -19,7 +19,8 @@ export default function ProjectCard({ project, onOpen }: ProjectCardProps) {
 
   return (
     <article
-      className="flex cursor-pointer flex-col gap-4 rounded-12 border bg-white p-4 sm:p-[22px] hover:border-primary"
+      // hover: lift with a soft shadow instead of a green border
+      className="flex cursor-pointer flex-col gap-4 rounded-12 border bg-white p-4 shadow-[0_1px_2px_rgba(17,20,32,0.04)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(17,20,32,0.10),0_2px_6px_rgba(17,20,32,0.05)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-[22px]"
       onClick={() => onOpen?.(project)}
     >
       <div className="flex items-start gap-3">

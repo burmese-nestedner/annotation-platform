@@ -14,7 +14,7 @@ export const MOCK_PROJECTS: Project[] = [
     name: "Burmese-NestedNER v1",
     mode: "nested",
     layers: 3,
-    tokenizer: "myWord",
+    tokenizer: "oppaWord",
     description:
       "Multi-layer nested NER annotation project with 3 annotators, 3 layers, and 18 entity types.",
     stats: { sentences: 4918, batches: 5, entityTypes: 7 },
@@ -26,7 +26,7 @@ export const MOCK_PROJECTS: Project[] = [
     name: "BurmeseNER Flat Reference",
     mode: "flat",
     layers: 1,
-    tokenizer: "myWord",
+    tokenizer: "oppaWord",
     description: "Flat-NER baseline for comparison with 18 entity types and Fleiss κ = 0.9408.",
     stats: { sentences: 4918, batches: 1, entityTypes: 5 },
     completion: 100,
