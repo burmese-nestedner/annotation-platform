@@ -15,7 +15,7 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     data-slot="select-trigger"
     className={cn(
-      "flex w-fit items-center justify-between gap-2 whitespace-nowrap rounded-5 border border-border bg-muted px-3 text-xs text-foreground outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground",
+      "flex w-fit items-center justify-between gap-2 whitespace-nowrap rounded-5 border border-border bg-muted px-3 text-xs text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground",
       size === "sm" ? "h-6" : "h-8",
       className,
     )}
