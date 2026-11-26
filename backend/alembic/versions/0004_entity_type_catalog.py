@@ -19,7 +19,6 @@ def upgrade() -> None:
         sa.Column("code", sa.String(50), nullable=False),
         sa.Column("label", sa.String(100), nullable=False),
         sa.Column("group_name", sa.String(50)),
-        sa.Column("color", sa.String(9)),
         sa.Column("description", sa.Text),
         sa.Column(
             "created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False

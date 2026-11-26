@@ -128,7 +128,6 @@ class EntityTypeCatalog(TimestampMixin, Base):
     code: Mapped[str] = mapped_column(String(50), unique=True)
     label: Mapped[str] = mapped_column(String(100))
     group_name: Mapped[str | None] = mapped_column(String(50))
-    color: Mapped[str | None] = mapped_column(String(9))
     description: Mapped[str | None] = mapped_column(Text)
 
 
