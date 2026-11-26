@@ -1,4 +1,4 @@
-import { looksLikeBioes, type ImportedTable } from "@/utils/importFile";
+import { TEXT_COLUMN_NAMES, looksLikeBioes, type ImportedTable } from "@/utils/importFile";
 
 export const MAX_LAYERS = 6;
 export const NOT_MAPPED = "__none"; // Radix Select needs a non-empty value
@@ -22,7 +22,7 @@ export function columnValues(table: ImportedTable, col: number): string[] {
   return table.rows.map((r) => r[col] ?? "");
 }
 
-const TOKEN_NAMES = ["token", "word", "text", "raw_text", "sentence"];
+const TOKEN_NAMES = ["token", "word", ...TEXT_COLUMN_NAMES];
 
 /** First guess: a token-like column -> token, BIOES-looking columns -> layer1, layer2, … */
 export function suggestMapping(table: ImportedTable, mode: string): Record<string, string> {

@@ -6,8 +6,16 @@ export interface ImportedSentence {
   tokens: string[] | null; // set when the file is already tokenized
 }
 
-/** Minimal RFC 4180 CSV parser (quotes, escaped quotes, CRLF). */
-export function parseCsv(input: string): string[][] {
+/** Column names that hold one whole sentence per row (shared with Column Map). */
+export const TEXT_COLUMN_NAMES = ["text", "raw_text", "sentence"];
+
+const ID_COLUMN = /(^|_)id$/;
+
+/**
+ * Minimal RFC 4180 CSV parser (quotes, escaped quotes, CRLF).
+ * Blank lines are dropped unless keepBlank is set (then they come back as []).
+ */
+export function parseCsv(input: string, keepBlank = false): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
   let field = "";
@@ -36,7 +44,18 @@ export function parseCsv(input: string): string[][] {
     row.push(field);
     rows.push(row);
   }
-  return rows.filter((r) => r.some((f) => f.trim() !== ""));
+  const isBlank = (r: string[]) => r.every((f) => f.trim() === "");
+  return keepBlank ? rows.map((r) => (isBlank(r) ? [] : r)) : rows.filter((r) => !isBlank(r));
+}
+
+/** Same id twice (e.g. a repeated sentence_id) would merge pipe edits and React keys. */
+function withUniqueIds(sentences: ImportedSentence[]): ImportedSentence[] {
+  const seen = new Map<string, number>();
+  return sentences.map((s) => {
+    const n = (seen.get(s.id) ?? 0) + 1;
+    seen.set(s.id, n);
+    return n === 1 ? s : { ...s, id: `${s.id}#${n}` };
+  });
 }
 
 function fromTokens(id: string, tokens: string[]): ImportedSentence {
@@ -66,27 +85,46 @@ export function parseConll(input: string): ImportedSentence[] {
  * Text containing "|" is treated as already pipe-tokenized.
  */
 export function parseCsvSentences(input: string): ImportedSentence[] {
-  const [header, ...rows] = parseCsv(input.replace(/^﻿/, ""));
+  const [header, ...rows] = parseCsv(input.replace(/^\uFEFF/, ""), true);
   if (!header) return [];
   const cols = header.map((h) => h.trim().toLowerCase());
   const tokenCol = cols.indexOf("token");
 
   if (tokenCol >= 0) {
     const idCol = cols.findIndex((c) => c === "sentence_id" || c === "sentence" || c === "sent_id");
+    if (idCol < 0) {
+      // no sentence id column: a blank row ends a sentence (like CoNLL)
+      const sentences: ImportedSentence[] = [];
+      let tokens: string[] = [];
+      const flush = () => {
+        if (tokens.length) sentences.push(fromTokens(String(sentences.length + 1), tokens));
+        tokens = [];
+      };
+      for (const r of rows) {
+        const token = (r[tokenCol] ?? "").trim();
+        if (r.length === 0) flush();
+        else if (token) tokens.push(token);
+      }
+      flush();
+      return sentences;
+    }
     const groups = new Map<string, string[]>();
-    rows.forEach((r, i) => {
-      const id = idCol >= 0 ? r[idCol] : String(i + 1);
+    for (const r of rows) {
       const token = (r[tokenCol] ?? "").trim();
-      if (!token) return;
+      if (r.length === 0 || !token) continue;
+      const id = r[idCol];
       if (!groups.has(id)) groups.set(id, []);
       groups.get(id)!.push(token);
-    });
+    }
     return [...groups].map(([id, tokens]) => fromTokens(id, tokens));
   }
 
-  const textCol = Math.max(cols.indexOf("text"), 0);
+  // text column by name; otherwise the first column that is not an id
+  const named = cols.findIndex((c) => TEXT_COLUMN_NAMES.includes(c));
+  const textCol = named >= 0 ? named : Math.max(cols.findIndex((c) => !ID_COLUMN.test(c)), 0);
   const idCol = cols.findIndex((c) => c === "sentence_id" || c === "id");
-  return rows
+  const sentences = rows
+    .filter((r) => r.length > 0)
     .map((r, i) => {
       const id = idCol >= 0 && idCol !== textCol ? r[idCol] : String(i + 1);
       const text = (r[textCol] ?? "").trim();
@@ -95,6 +133,7 @@ export function parseCsvSentences(input: string): ImportedSentence[] {
       return { id, text, tokens: null };
     })
     .filter((s): s is ImportedSentence => s !== null);
+  return withUniqueIds(sentences);
 }
 
 export interface ImportedTable {
@@ -113,7 +152,7 @@ export function parseTable(input: string, isConll: boolean): ImportedTable {
     const width = Math.max(0, ...rows.map((r) => r.length));
     return { columns: Array.from({ length: width }, (_, i) => `column_${i + 1}`), rows };
   }
-  const [header = [], ...rows] = parseCsv(input.replace(/^﻿/, ""));
+  const [header = [], ...rows] = parseCsv(input.replace(/^\uFEFF/, ""));
   return { columns: header.map((h) => h.trim()), rows };
 }
 
