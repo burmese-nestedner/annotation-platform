@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import AnnotationGrid from "../components/annotation/AnnotationGrid";
 import EntityLegend from "../components/annotation/EntityLegend";
@@ -6,16 +6,43 @@ import StatusBar from "../components/annotation/StatusBar";
 import { Button } from "@/components/ui/button";
 import AlertPill from "../components/ui/AlertPill";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ENTITY_TYPES, LAYERS, MOCK_ERRORS, MOCK_SENTENCES } from "../data/mockAnnotation";
+import { ENTITY_TYPES, LAYERS, MOCK_SENTENCES } from "../data/mockAnnotation";
 import type { Project } from "../types/project";
+import type { Sentence } from "../types/annotation";
+import { validateBioes } from "@/utils/bioes";
+
+const ENTITY_CODES = new Set(ENTITY_TYPES.map((e) => e.code));
 
 export default function AnnotationPage() {
   const { project } = useOutletContext<{ project: Project }>();
   const [sentenceId, setSentenceId] = useState("all");
+  // editable copy of the mock data until the annotations API exists
+  const [data, setData] = useState<Sentence[]>(MOCK_SENTENCES);
 
   const layers = LAYERS.slice(0, project.layers);
-  const sentences = MOCK_SENTENCES.filter((s) => sentenceId === "all" || s.id === sentenceId);
-  const errors = MOCK_ERRORS.filter((e) => e.layer < project.layers);
+  const sentences = useMemo(
+    () => data.filter((s) => sentenceId === "all" || s.id === sentenceId),
+    [data, sentenceId],
+  );
+  // real-time BIOES check over what is shown
+  const errors = useMemo(
+    () => validateBioes(sentences, project.layers, ENTITY_CODES),
+    [sentences, project.layers],
+  );
+
+  const setTag = (sid: string, tokenIndex: number, layer: number, tag: string) =>
+    setData((prev) =>
+      prev.map((s) =>
+        s.id !== sid
+          ? s
+          : {
+              ...s,
+              tokens: s.tokens.map((t, i) =>
+                i !== tokenIndex ? t : { ...t, tags: t.tags.map((g, l) => (l === layer ? tag : g)) },
+              ),
+            },
+      ),
+    );
   const tokenCount = sentences.reduce((n, s) => n + s.tokens.length, 0);
 
   return (
@@ -40,7 +67,7 @@ export default function AnnotationPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              {MOCK_SENTENCES.map((s) => (
+              {data.map((s) => (
                 <SelectItem key={s.id} value={s.id}>
                   {s.id}
                 </SelectItem>
@@ -51,10 +78,16 @@ export default function AnnotationPage() {
         <Button size="sm">Save</Button>
       </header>
 
-      <EntityLegend entities={ENTITY_TYPES} hint="Click a cell to edit · Errors highlighted in red" />
+      <EntityLegend entities={ENTITY_TYPES} hint="Click a cell to change its tag · Hover a red cell to see the error" />
 
       <div className="@container flex-1 overflow-auto">
-        <AnnotationGrid sentences={sentences} layers={[...layers]} entities={ENTITY_TYPES} errors={errors} />
+        <AnnotationGrid
+          sentences={sentences}
+          layers={[...layers]}
+          entities={ENTITY_TYPES}
+          errors={errors}
+          onTagChange={setTag}
+        />
       </div>
 
       <StatusBar

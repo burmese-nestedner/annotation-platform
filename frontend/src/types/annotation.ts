@@ -2,6 +2,7 @@ import type { Tone } from "../components/ui/tone";
 
 export interface EntityType {
   code: string;
+  label: string;
   tone: Tone;
 }
 
