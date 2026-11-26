@@ -34,6 +34,8 @@ interface NewProjectState {
   setCustomTypes: Dispatch<SetStateAction<EntityTypeOption[]>>;
   layers: number;
   setLayers: Dispatch<SetStateAction<number>>;
+  layersTouched: boolean; // user picked a layer count on step 4
+  setLayersTouched: Dispatch<SetStateAction<boolean>>;
 }
 
 const EMPTY_FORM: NewProjectForm = {
@@ -57,6 +59,7 @@ export function NewProjectProvider({ children }: { children: ReactNode }) {
   const [entities, setEntities] = useState<ProjectEntity[]>([]);
   const [customTypes, setCustomTypes] = useState<EntityTypeOption[]>([]);
   const [layers, setLayers] = useState(2);
+  const [layersTouched, setLayersTouched] = useState(false);
   return (
     <NewProjectContext.Provider
       value={{
@@ -78,6 +81,8 @@ export function NewProjectProvider({ children }: { children: ReactNode }) {
         setCustomTypes,
         layers,
         setLayers,
+        layersTouched,
+        setLayersTouched,
       }}
     >
       {children}

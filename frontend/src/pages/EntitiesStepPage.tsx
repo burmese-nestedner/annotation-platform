@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Check, X } from "@/components/icons";
 import EntityTypePicker from "@/components/projects/EntityTypePicker";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ENTITY_COLORS, ENTITY_TYPE_CATALOG, type EntityTypeOption } from "@/data/entityTypes";
 import { cn } from "@/lib/utils";
-import { MAX_LAYERS } from "@/utils/columnMap";
+import { MAX_LAYERS, mappedLayerCount } from "@/utils/columnMap";
 
 // Layer badge colours: violet, cyan, then the remaining swatches
 const LAYER_COLORS = ["#a78bfa", "#22d3ee", "#60a5fa", "#fbbf24", "#f472b6", "#34d399"];
@@ -106,13 +106,33 @@ function CustomEntityForm({
 
 export default function EntitiesStepPage() {
   const navigate = useNavigate();
-  const { form, table, entities, setEntities, customTypes, setCustomTypes, layers, setLayers } = useNewProject();
+  const {
+    form,
+    table,
+    mapping,
+    entities,
+    setEntities,
+    customTypes,
+    setCustomTypes,
+    layers,
+    setLayers,
+    layersTouched,
+    setLayersTouched,
+  } = useNewProject();
   const [customDraft, setCustomDraft] = useState<string | null>(null); // null = form closed
   const [submitted, setSubmitted] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
   const catalog = useMemo(() => [...ENTITY_TYPE_CATALOG, ...customTypes], [customTypes]);
   const selected = useMemo(() => new Set(entities.map((e) => e.code)), [entities]);
+  // layers the file already has tag columns for (step 3); the project needs at least these
+  const mappedLayers = mappedLayerCount(mapping, form.mode);
+
+  useEffect(() => {
+    if (form.mode !== "nested" || mappedLayers === 0) return;
+    if (!layersTouched || layers < mappedLayers) setLayers(mappedLayers);
+    // only when the mapping changes; a manual pick is kept if it still fits
+  }, [mappedLayers, form.mode]);
 
   if (!table) return <Navigate to="/projects/new" replace />;
 
@@ -147,7 +167,7 @@ export default function EntitiesStepPage() {
             <div ref={listRef} className="flex flex-col gap-[5px] pt-2">
               {entities.length === 0 && (
                 <p className="rounded-7 border border-dashed border-border bg-white px-3 py-4 text-center text-[12px] text-muted-foreground">
-                  No entity types yet. Use <b className="font-semibold text-foreground">Add entity type</b> to pick some.
+                  No entity types yet. Use <b className="font-semibold text-primary">Add entity type</b> to pick some.
                 </p>
               )}
               {entities.map((e) => (
@@ -224,18 +244,29 @@ export default function EntitiesStepPage() {
                     type="button"
                     role="radio"
                     aria-checked={n === layers}
-                    onClick={() => setLayers(n)}
+                    disabled={n < mappedLayers}
+                    title={n < mappedLayers ? `The file has tag columns for ${mappedLayers} layers` : undefined}
+                    onClick={() => {
+                      setLayers(n);
+                      setLayersTouched(true);
+                    }}
                     className={cn(
-                      "flex size-[52px] items-center justify-center rounded-8 border-[1.5px] font-mono text-[18px] font-bold outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                      "flex size-[52px] items-center justify-center rounded-8 border-[1.5px] font-mono text-[18px] font-bold outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-40",
                       n === layers
                         ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-white text-muted-foreground hover:bg-muted",
+                        : "border-border bg-white text-muted-foreground enabled:hover:bg-muted",
                     )}
                   >
                     {n}
                   </button>
                 ))}
               </div>
+              {mappedLayers > 0 && (
+                <p className="pt-2 text-[11px] leading-[16.5px] text-muted-foreground">
+                  Your file has tag columns for {mappedLayers} {mappedLayers === 1 ? "layer" : "layers"}, so the project
+                  needs at least {mappedLayers}.
+                </p>
+              )}
               <div className="mt-4 flex flex-col gap-2.5 rounded-8 border border-border bg-white px-4 py-3.5">
                 {Array.from({ length: layerCount }, (_, i) => {
                   const c = LAYER_COLORS[i % LAYER_COLORS.length];

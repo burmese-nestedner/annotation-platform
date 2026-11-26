@@ -5,6 +5,7 @@ EXPECTED_TABLES = {
     "projects",
     "project_members",
     "entity_types",
+    "entity_type_catalog",
     "nesting_rules",
     "documents",
     "sentences",

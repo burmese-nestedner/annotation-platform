@@ -9,6 +9,15 @@ export function mappingTargets(mode: string): string[] {
   return ["token", ...Array.from({ length: layers }, (_, i) => `layer${i + 1}`)];
 }
 
+/** Highest layer a file column is mapped to (0 = no tag columns mapped). */
+export function mappedLayerCount(mapping: Record<string, string>, mode: string): number {
+  const targets = mappingTargets(mode);
+  return Object.values(mapping).reduce((max, t) => {
+    const m = /^layer(\d+)$/.exec(t);
+    return m && targets.includes(t) ? Math.max(max, Number(m[1])) : max;
+  }, 0);
+}
+
 export function columnValues(table: ImportedTable, col: number): string[] {
   return table.rows.map((r) => r[col] ?? "");
 }
