@@ -1,0 +1,82 @@
+/* shadcn semantic colors: single source of truth (Figma "Colors" variables map to these) */
+:root {
+  --background: #ffffff;
+  --foreground: #111420;
+  --card: #ffffff;
+  --card-foreground: #111420;
+  --popover: #ffffff;
+  --popover-foreground: #111420;
+  --primary: #009e82;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f4f9;
+  --secondary-foreground: #111420;
+  --muted: #f2f4f9;
+  --muted-foreground: #7c84a3;
+  --accent: #f2f4f9;
+  --accent-foreground: #111420;
+  --destructive: #e0293c;
+  --border: #dde2f0;
+  --input: #dde2f0;
+  --ring: #009e82;
+  --radius: 8px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* project tokens: static so every variable is emitted even if no utility uses it yet */
+@theme static {
+  --color-white: #ffffff;
+  --color-primary-light: #34d399;
+  --color-violet: #a78bfa;
+  --color-blue: #60a5fa;
+  --color-cyan: #22d3ee;
+  --color-amber: #fbbf24;
+  --color-pink: #f472b6;
+  --color-red: #f87171;
+  --color-green: #34d399;
+  --color-track: #e8ecf5;
+  --color-tag-begin: #2563eb;
+  --color-tag-single: #16a34a;
+  --color-scroll-bg: #fafafc;
+  --color-scroll-track: #ebf0f7;
+  --color-scroll-thumb: #9eabc4;
+  --color-text-secondary: #596380;
+  --color-error-row: #ff4757;
+
+  --font-sans: "Inter", "Noto Sans Myanmar", "Myanmar Text", system-ui, sans-serif;
+  --font-burmese: "Padauk", "Noto Sans Myanmar", "Myanmar Text", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-3: 3px;
+  --radius-4: 4px;
+  --radius-5: 5px;
+  --radius-6: 6px;
+  --radius-7: 7px;
+  --radius-8: 8px;
+  --radius-10: 10px;
+  --radius-12: 12px;
+  --radius-full: 9999px;
+}

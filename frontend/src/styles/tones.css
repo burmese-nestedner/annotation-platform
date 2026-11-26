@@ -1,0 +1,37 @@
+.tone-primary {
+  --tone-color: var(--primary);
+}
+
+.tone-amber {
+  --tone-color: var(--color-amber);
+}
+
+.tone-violet {
+  --tone-color: var(--color-violet);
+  --tone-bg: rgba(167, 139, 250, 0.13);
+  --tone-border: rgba(167, 139, 250, 0.25);
+}
+
+.tone-blue {
+  --tone-color: var(--color-blue);
+  --tone-bg: rgba(96, 165, 250, 0.13);
+  --tone-border: rgba(96, 165, 250, 0.25);
+}
+
+.tone-cyan {
+  --tone-color: var(--color-cyan);
+  --tone-bg: rgba(34, 211, 238, 0.08);
+  --tone-border: rgba(34, 211, 238, 0.19);
+}
+
+.tone-pink {
+  --tone-color: var(--color-pink);
+}
+
+.tone-red {
+  --tone-color: var(--color-red);
+}
+
+.tone-green {
+  --tone-color: var(--color-green);
+}

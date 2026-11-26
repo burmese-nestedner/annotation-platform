@@ -1,4 +1,4 @@
-"""Annotation schema: one row per (token, layer, annotator); a missing row means O."""
+"""Annotation schema: one row per (token, layer, annotator), including O."""
 
 from __future__ import annotations
 
@@ -54,6 +54,7 @@ class TagPrefix(str, enum.Enum):
     I = "I"  # noqa: E741
     E = "E"
     S = "S"
+    O = "O"  # noqa: E741
 
 
 class GoldSource(str, enum.Enum):
@@ -193,6 +194,9 @@ class Annotation(Base):
     __table_args__ = (
         UniqueConstraint("batch_id", "token_id", "layer", "annotator_id"),
         CheckConstraint("layer >= 1", name="layer_positive"),
+        CheckConstraint(
+            "(prefix = 'O') = (entity_type_id IS NULL)", name="prefix_type_match"
+        ),
         Index("ix_annotations_batch_annotator", "batch_id", "annotator_id"),
     )
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -201,7 +205,7 @@ class Annotation(Base):
     layer: Mapped[int] = mapped_column(SmallInteger)
     annotator_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     prefix: Mapped[TagPrefix] = mapped_column(_enum(TagPrefix, "tag_prefix"))
-    entity_type_id: Mapped[int] = mapped_column(ForeignKey("entity_types.id"))
+    entity_type_id: Mapped[int | None] = mapped_column(ForeignKey("entity_types.id"))
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
@@ -212,12 +216,15 @@ class GoldAnnotation(Base):
     __table_args__ = (
         UniqueConstraint("token_id", "layer"),
         CheckConstraint("layer >= 1", name="layer_positive"),
+        CheckConstraint(
+            "(prefix = 'O') = (entity_type_id IS NULL)", name="prefix_type_match"
+        ),
     )
     id: Mapped[int] = mapped_column(primary_key=True)
     token_id: Mapped[int] = mapped_column(ForeignKey("tokens.id", ondelete="CASCADE"))
     layer: Mapped[int] = mapped_column(SmallInteger)
     prefix: Mapped[TagPrefix] = mapped_column(_enum(TagPrefix, "tag_prefix"))
-    entity_type_id: Mapped[int] = mapped_column(ForeignKey("entity_types.id"))
+    entity_type_id: Mapped[int | None] = mapped_column(ForeignKey("entity_types.id"))
     source: Mapped[GoldSource] = mapped_column(_enum(GoldSource, "gold_source"))
     resolved_by: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
     resolved_at: Mapped[datetime] = mapped_column(

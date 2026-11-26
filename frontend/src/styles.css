@@ -1,5 +1,4 @@
-body { margin: 0; font-family: system-ui, "Noto Sans Myanmar", "Myanmar Text", sans-serif; }
-.page { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
-h1 { font-size: 1.4rem; margin: 0 0 4px; }
-.status { color: #555; margin: 0 0 16px; }
-.grid { height: 360px; }
+.demo-page { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+.demo-title { font-size: 1.4rem; margin: 0 0 4px; }
+.demo-status { color: #555; margin: 0 0 16px; }
+.demo-grid { height: 360px; }
