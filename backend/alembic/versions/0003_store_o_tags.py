@@ -1,4 +1,5 @@
 """Store O tags explicitly."""
+
 from collections.abc import Sequence
 
 from alembic import op
