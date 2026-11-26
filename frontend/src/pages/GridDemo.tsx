@@ -34,12 +34,12 @@ export default function GridDemo() {
   }, []);
 
   return (
-    <main className="page">
+    <main className="demo-page">
       <header>
-        <h1>Annotation grid (scaffold)</h1>
-        <p className="status">Status: {status}</p>
+        <h1 className="demo-title">Annotation grid (scaffold)</h1>
+        <p className="demo-status">Status: {status}</p>
       </header>
-      <div className="grid">
+      <div className="demo-grid">
         <AgGridReact<Row> rowData={SAMPLE} columnDefs={COLUMNS} />
       </div>
     </main>

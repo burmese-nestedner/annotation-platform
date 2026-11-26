@@ -1,0 +1,43 @@
+:root {
+  --color-placeholder: rgba(17, 20, 32, 0.5);
+  --color-danger-bg: rgba(224, 41, 60, 0.1);
+  --shadow-popover: 0 8px 24px rgba(17, 20, 32, 0.14);
+
+  --fs-8: 8px;
+  --fs-9: 9px;
+  --fs-10: 10px;
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-15: 15px;
+  --fs-16: 16px;
+  --fw-regular: 400;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --line-height-base: 1.5;
+
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-3: 3px;
+  --space-4: 4px;
+  --space-5: 5px;
+  --space-6: 6px;
+  --space-7: 7px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-18: 18px;
+  --space-20: 20px;
+  --space-22: 22px;
+  --space-24: 24px;
+  --space-28: 28px;
+  --space-32: 32px;
+
+  --line: 1px solid var(--border);
+  --content-max-width: 1100px;
+  --topbar-height: 56px;
+  --sidebar-width: 224px;
+}
