@@ -117,6 +117,21 @@ class EntityType(Base):
     description: Mapped[str | None] = mapped_column(Text)
 
 
+class EntityTypeCatalog(TimestampMixin, Base):
+    """Shared list of entity types to pick from when creating a project (not tied to a project).
+
+    Picked types are copied into entity_types for the new project.
+    """
+
+    __tablename__ = "entity_type_catalog"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(50), unique=True)
+    label: Mapped[str] = mapped_column(String(100))
+    group_name: Mapped[str | None] = mapped_column(String(50))
+    color: Mapped[str | None] = mapped_column(String(9))
+    description: Mapped[str | None] = mapped_column(Text)
+
+
 class NestingRule(Base):
     """Allowed parent -> child type pairs (Table 3.2)."""
 
