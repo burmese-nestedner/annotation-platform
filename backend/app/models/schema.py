@@ -194,9 +194,7 @@ class Annotation(Base):
     __table_args__ = (
         UniqueConstraint("batch_id", "token_id", "layer", "annotator_id"),
         CheckConstraint("layer >= 1", name="layer_positive"),
-        CheckConstraint(
-            "(prefix = 'O') = (entity_type_id IS NULL)", name="prefix_type_match"
-        ),
+        CheckConstraint("(prefix = 'O') = (entity_type_id IS NULL)", name="prefix_type_match"),
         Index("ix_annotations_batch_annotator", "batch_id", "annotator_id"),
     )
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -216,9 +214,7 @@ class GoldAnnotation(Base):
     __table_args__ = (
         UniqueConstraint("token_id", "layer"),
         CheckConstraint("layer >= 1", name="layer_positive"),
-        CheckConstraint(
-            "(prefix = 'O') = (entity_type_id IS NULL)", name="prefix_type_match"
-        ),
+        CheckConstraint("(prefix = 'O') = (entity_type_id IS NULL)", name="prefix_type_match"),
     )
     id: Mapped[int] = mapped_column(primary_key=True)
     token_id: Mapped[int] = mapped_column(ForeignKey("tokens.id", ondelete="CASCADE"))
