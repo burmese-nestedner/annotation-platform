@@ -54,7 +54,7 @@ class TagPrefix(str, enum.Enum):
     I = "I"  # noqa: E741
     E = "E"
     S = "S"
-    O = "O"
+    O = "O"  # noqa: E741
 
 
 class GoldSource(str, enum.Enum):
